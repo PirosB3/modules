@@ -6,6 +6,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
+	keeper "github.com/PirosB3/coinswap/incubator/coinswap/internal/keeper"
+	asd "github.com/PirosB3/coinswap/incubator/coinswap/internal/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +16,6 @@ import (
 )
 
 var (
-	_ module.AppModule      = AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
 )
 
@@ -28,18 +29,18 @@ func (AppModuleBasic) Name() string {
 
 // RegisterCodec registers module codec
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	RegisterCodec(cdc)
+	asd.RegisterCodec(cdc)
 }
 
 // DefaultGenesis default genesis state
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
-	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
+	return asd.ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 }
 
 // ValidateGenesis module validate genesis
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	var data GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &data)
+	err := asd.ModuleCdc.UnmarshalJSON(bz, &data)
 	if err != nil {
 		return err
 	}
@@ -65,20 +66,15 @@ type AppModule struct {
 
 // NewAppModule creates a new AppModule object
 func NewAppModule(keeper Keeper) module.AppModule {
-	return sdk.NewGenesisOnlyAppModule(AppModule{
+	return module.NewGenesisOnlyAppModule(AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 	})
 }
 
-// RegisterInvariants registers the coinswap module invariants
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRouter) {
-	RegisterInvariants(ir, am.keeper)
-}
-
 // Route module message route name
 func (AppModule) Route() string {
-	return RouterKey
+	return asd.RouterKey
 }
 
 // NewHandler module handler
@@ -88,18 +84,18 @@ func (am AppModule) NewHandler() sdk.Handler {
 
 // QuerierRoute module querier route name
 func (AppModule) QuerierRoute() string {
-	return QuerierRoute
+	return asd.QuerierRoute
 }
 
 // NewQuerierHandler module querier
 func (am AppModule) NewQuerierHandler() sdk.Querier {
-	return NewQuerier(am.keeper)
+	return keeper.NewQuerier(am.keeper)
 }
 
 // InitGenesis coinswap module init-genesis
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
-	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
+	asd.ModuleCdc.MustUnmarshalJSON(data, &genesisState)
 	InitGenesis(ctx, am.keeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
@@ -107,7 +103,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.Va
 // ExportGenesis module export genesis
 func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
-	return ModuleCdc.MustMarshalJSON(gs)
+	return asd.ModuleCdc.MustMarshalJSON(gs)
 }
 
 // BeginBlock module begin-block

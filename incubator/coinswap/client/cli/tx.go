@@ -15,7 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/cosmos/cosmos-sdk/x/coinswap/internal/types"
+	"github.com/PirosB3/coinswap/incubator/coinswap/internal/types"
 )
 
 // Liquidity flags
